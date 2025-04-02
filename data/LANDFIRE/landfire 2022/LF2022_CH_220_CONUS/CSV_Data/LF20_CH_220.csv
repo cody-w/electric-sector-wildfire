@@ -1,0 +1,16 @@
+﻿VALUE,MetersX10,Meters,R,G,B,RED,GREEN,BLUE
+-9999,Fill-NoData,Fill-NoData,255,255,255,1.000000,1.000000,1.000000
+0,Non-Forested,Non-Forested,130,130,130,0.509804,0.509804,0.509804
+30,Forest Height 018 to 050 meters X 10,Forest Height 01.8 to 05 meters,204,255,204,0.800000,1.000000,0.800000
+70,Forest Height 050 to 090 meters X 10,Forest Height 05 to 09 meters,192,252,189,0.752941,0.988235,0.741176
+110,Forest Height 090 to 130 meters X 10,Forest Height 09 to 13 meters,176,247,171,0.690196,0.968627,0.670588
+150,Forest Height 130 to 170 meters x 10,Forest Height 13 to 17 meters,164,245,157,0.643137,0.960784,0.615686
+190,Forest Height 170 to 210 meters X 10,Forest Height 17 to 21 meters,150,240,141,0.588235,0.941176,0.552941
+230,Forest Height 210 to 250 meters X 10,Forest Height 21 to 25 meters,135,235,124,0.529412,0.921569,0.486275
+270,Forest Height 250 to 290 meters X 10,Forest Height 25 to 29 meters,123,232,111,0.482353,0.909804,0.435294
+310,Forest Height 290 to 330 meters X 10,Forest Height 29 to 33 meters,106,227,95,0.415686,0.890196,0.372549
+350,Forest Height 330 to 370 meters X 10,Forest Height 33 to 37 meers,94,222,82,0.368627,0.870588,0.321569
+390,Forest Height 370 to 410 meters X 10,Forest Height 37 to 41 meters,77,217,67,0.301961,0.850980,0.262745
+430,Forest Height 410 to 450 meters X 10,Forest Height 41 to 45 meters,62,214,51,0.243137,0.839216,0.200000
+470,Forest Height 450 to 490 meters X 10,Forest Height 45 to 49 meters,41,209,36,0.160784,0.819608,0.141176
+510,Forest Height > 500 meters X 10,Forest Height >= 50 meters,14,204,14,0.054902,0.800000,0.054902
