@@ -9,7 +9,7 @@
 rm(list=ls(all=T)); gc()
 
 # Set directory
-setwd("C:/Users/codyw/OneDrive/Documents/UC Berkeley/Analysis/Ignitions/For GitHub/")
+setwd("C:/Users/codyw/OneDrive/Documents/UC Berkeley/Analysis/Ignitions/Clone/electric-sector-wildfire/")
 
 # Packages
 library(MASS) # be careful here select/dplyr masked
