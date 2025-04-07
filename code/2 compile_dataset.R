@@ -1,8 +1,6 @@
 ################################################################################
-##
-## Project: Ignitions
+## File: Compile Dataset
 ## Purpose: Stitch together ignitions, treatment data, and covariates
-##
 ################################################################################
 
 # Load treatment data

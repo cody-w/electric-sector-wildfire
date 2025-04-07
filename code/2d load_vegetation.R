@@ -153,6 +153,8 @@ save(results, file='./intermediate/Intermediate Vegetation/vegetation_height_201
 
 # Load raster file
 df_veg <- raster::raster("./data/LANDFIRE/landfire_2020/LF2020_CH_200_CONUS/Tif/LC20_CH_200.tif")
+save(df_veg, file='./data/LANDFIRE/landfire_2020/LF2020_CH_200_CONUS/Tif/LC20_CH_200.RData')
+load(file='./data/LANDFIRE/landfire_2020/LF2020_CH_200_CONUS/Tif/LC20_CH_200.RData')
 xwalk_20 <- read.csv('./data/LANDFIRE/landfire_2020/LF2020_CH_200_CONUS/CSV_Data/LF16_CH_200.csv') %>% 
   select(VALUE, Meters)
 
@@ -207,7 +209,8 @@ save(results, file='./intermediate/Intermediate Vegetation/vegetation_height_202
 ########
 
 # Load raster file
-df_veg <- raster::raster("./data/LANDFIRE/landfire_2014/US_140_CH/Tif/us_140ch.tif")
+#df_veg <- raster::raster("./data/LANDFIRE/landfire_2014/US_140_CH/Tif/us_140ch.tif")
+load(file='./data/LANDFIRE/landfire_2014/US_140_CH/Tif/us_140ch.RData')
 xwalk_14 <- read.csv('./data/LANDFIRE/landfire_2014/US_140_CH/CSV_Data/us_140ch.csv') %>% 
   select(VALUE, CH_M_X_10)
 
