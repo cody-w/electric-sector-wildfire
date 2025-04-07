@@ -302,8 +302,9 @@ df <- df %>%
 # Note-- one ignition is not near any PG&E distribution lines
 
 ################################################################################
+# Try to match on coordinates (lat/long)
+# * Repeat analysis for 2023 ignitions
 ################################################################################
-# Try to match on coordinates (lat/long) **** REPEAT FOR 2023
 
 # Load spatial data
 load(file='./intermediate/PGE_circuits.RData')
