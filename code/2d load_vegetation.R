@@ -96,7 +96,8 @@ save(results, file='./intermediate/Intermediate Vegetation/vegetation_height_202
 ########
 
 # Load raster file
-df_veg <- raster::raster("./data/LANDFIRE/landfire_2019/LF2019_CH_200_CONUS/Tif/LC19_CH_200.tif")
+#df_veg <- raster::raster("./data/LANDFIRE/landfire_2019/LF2019_CH_200_CONUS/Tif/LC19_CH_200.tif")
+load(file='./data/LANDFIRE/landfire_2019/LF2019_CH_200_CONUS/Tif/LC19_CH_200.RData')
 xwalk_19 <- read.csv('./data/LANDFIRE/landfire_2019/LF2019_CH_200_CONUS/CSV_Data/LF16_CH_200.csv') %>% 
   select(VALUE, Meters)
 
