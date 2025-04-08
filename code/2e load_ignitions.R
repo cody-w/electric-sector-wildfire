@@ -225,62 +225,67 @@ df <- left_join(df, results)
 # Try to match on coordinates (lat/long)
 ################################################################################
 
-# Load spatial data
-load(file='./intermediate/PGE_circuits.RData')
-
-# Create spatial data
-df_spatial <- df %>%
-  st_as_sf(coords = c('longitude', 'latitude'),
-           crs=st_crs(4326))
-df_spatial <- st_transform(df_spatial, st_crs(lines_OH))
-
-# Create id
-df_spatial$id<-1:nrow(df_spatial)
-
-# Write function for lat/long matching
-matchLatLong <- function(check, lines) {
-
-  # Create a buffer around point (1 square kilometer)
-  tmp_buffer <- st_buffer(check, 5.7E2)
-
-  # Subset to circuits within buffer
-  tmp_lines <- st_crop(lines, tmp_buffer)
-
-  # Calculate distance
-  tmp_lines$dist <- as.numeric(st_distance(tmp_lines,check))
-
-  # Find nearest
-  tmp_lines <- tmp_lines %>%
-    as.data.frame() %>%
-    filter(dist==min(dist)) %>%
-    select(circuit, CIRCUITID, CONVCIRCUITID, dist)
-  out<-tmp_lines
-  try(out$id<-check$id, silent = T) # Skip and catch error if no matches
-  return(out)
+if (SWITCH_NEW_LOAD) {
+  # Load spatial data
+  load(file='./intermediate/PGE_circuits.RData')
+  
+  # Create spatial data
+  df_spatial <- df %>%
+    st_as_sf(coords = c('longitude', 'latitude'),
+             crs=st_crs(4326))
+  df_spatial <- st_transform(df_spatial, st_crs(lines_OH))
+  
+  # Create id
+  df_spatial$id<-1:nrow(df_spatial)
+  
+  # Write function for lat/long matching
+  matchLatLong <- function(check, lines) {
+    
+    # Create a buffer around point (1 square kilometer)
+    tmp_buffer <- st_buffer(check, 5.7E2)
+    
+    # Subset to circuits within buffer
+    tmp_lines <- st_crop(lines, tmp_buffer)
+    
+    # Calculate distance
+    tmp_lines$dist <- as.numeric(st_distance(tmp_lines,check))
+    
+    # Find nearest
+    tmp_lines <- tmp_lines %>%
+      as.data.frame() %>%
+      filter(dist==min(dist)) %>%
+      select(circuit, CIRCUITID, CONVCIRCUITID, dist)
+    out<-tmp_lines
+    try(out$id<-check$id, silent = T) # Skip and catch error if no matches
+    return(out)
+  }
+  
+  # Write parallel wrapper function
+  ParallelLatLong <- function(i) {
+    
+    # Loop
+    foreach(i=1:nrow(df_spatial), .combine = rbind,
+            .export=c('df_spatial', 'lines_OH', 'matchLatLong'),
+            .packages=c('dplyr', 'sf')) %dopar% {
+              
+              matched <- matchLatLong(check=df_spatial[i,], lines=lines_OH)
+              
+            }
+    
+  }
+  
+  # Cores for parallel processing
+  no_cores <- detectCores()
+  registerDoParallel(5) # pick your number of cores here for parallel processing
+  
+  # Run parallel processing
+  system.time(df_match<-ParallelLatLong())
+  stopImplicitCluster()
+  
+  save(df_match, file='./intermediate/Intermediate Ignitions/matched_ignitions.RData')
+} else {
+  load('./intermediate/Intermediate Ignitions/matched_ignitions.RData')
 }
-
-# Write parallel wrapper function
-ParallelLatLong <- function(i) {
-
-  # Loop
-  foreach(i=1:nrow(df_spatial), .combine = rbind,
-          .export=c('df_spatial', 'lines_OH', 'matchLatLong'),
-          .packages=c('dplyr', 'sf')) %dopar% {
-
-            matched <- matchLatLong(check=df_spatial[i,], lines=lines_OH)
-
-          }
-
-}
-
-# Cores for parallel processing
-no_cores <- detectCores()
-registerDoParallel(7) # pick your number of cores here for parallel processing
-
-# Run parallel processing
-system.time(df_match<-ParallelLatLong())
-stopImplicitCluster()
-load('./intermediate/Intermediate Ignitions/matched_ignitions.RData')
 
 # Merge in with data
 df_match <- df_match %>% 
@@ -301,101 +306,15 @@ df <- df %>%
 
 # Note-- one ignition is not near any PG&E distribution lines
 
-################################################################################
-# Try to match on coordinates (lat/long)
-# * Repeat analysis for 2023 ignitions
-################################################################################
-
-# Load spatial data
-load(file='./intermediate/PGE_circuits.RData')
-
-# Create spatial data
-df_spatial <- df %>%
-  st_as_sf(coords = c('longitude', 'latitude'),
-           crs=st_crs(4326)) %>% 
-  filter(year==2023)
-df_spatial <- st_transform(df_spatial, st_crs(lines_OH))
-
-# Create id
-df_spatial$id<-1:nrow(df_spatial)
-
-
-# # Write function
-# matchLatLong <- function(check, lines) {
-# 
-#   #check <- df_spatial[df_spatial$id==3303,]
-# 
-#   # Create a reasonable buffer around point (1 square kilometer)
-#   tmp_buffer <- st_buffer(check, 5.7E2)
-# 
-#   # Subset to circuits within buffer
-#   tmp_lines <- st_crop(lines, tmp_buffer)
-# 
-#   # Calculate distance
-#   tmp_lines$dist <- as.numeric(st_distance(tmp_lines,check))
-# 
-#   # Find nearest
-#   tmp_lines <- tmp_lines %>%
-#     as.data.frame() %>%
-#     filter(dist==min(dist)) %>%
-#     select(circuit, CIRCUITID, CONVCIRCUITID, dist)
-#   out<-tmp_lines
-#   try(out$id<-check$id, silent = T) # Skip and catch error if no matches
-#   return(out)
-# }
-# 
-# # Write parallel wrapper function
-# library(doParallel)
-# ParallelLatLong <- function(i) {
-# 
-#   # Loop
-#   foreach(i=1:359, .combine = rbind,
-#           .export=c('df_spatial', 'lines_OH', 'matchLatLong'),
-#           .packages=c('dplyr', 'sf')) %dopar% {
-# 
-#             matched <- matchLatLong(check=df_spatial[i,], lines=lines_OH)
-# 
-#           }
-# 
-# }
-# 
-# # Cores for parallel processing
-# no_cores <- detectCores()
-# registerDoParallel(6)
-# 
-# # Run parallel processing
-# system.time(df_match<-ParallelLatLong())
-# stopImplicitCluster()
-# save(df_match, file='./intermediate_24/matched_ignitions_23.RData')
-load(file='./intermediate_24/matched_ignitions_23.RData')
-
-# Merge in with data
-df_match <- df_match %>% 
-  rename(circuit.spatial2 = circuit) %>% 
-  select(circuit.spatial2, dist, id)
-tmp<-df_spatial %>% 
-  as.data.frame() %>% 
-  select(index,date,time,id)
-tmp<-left_join(tmp,unique(df_match))
-df <- left_join(df, tmp %>% select(-id, -dist))
-
 
 ################################################################################
 ################################################################################
 # Check circuit name
 
-# Check discrepancies
-tmp <- df %>% 
-  filter(!is.na(circuit.name) & !is.na(circuit.spatial) & !is.na(circuit.spatial2))
-tmp <- tmp %>% 
-  filter(circuit.name!=circuit.spatial)
-tmp <- tmp %>% 
-  filter(circuit.name!=circuit.spatial2)
-
 # Drop missing
 df <- df %>% 
   filter(!(is.na(circuit.name) & is.na(circuit.facility) & 
-             is.na(circuit.spatial) & is.na(circuit.spatial2)))
+             is.na(circuit.spatial)))
 
 ################################################################################
 ################################################################################
