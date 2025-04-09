@@ -39,7 +39,8 @@ df_treatment <- left_join(df_treatment, psps_results)
 
 # Set to zero if NA for PSPS
 df_treatment <- df_treatment %>% 
-  mutate(across(psps_customer_hours:is_psps_ignition, ~ifelse(is.na(.), 0, .)))
+  mutate(across(psps_customer_hours:is_psps_ignition, ~ifelse(is.na(.), 0, .))) %>% 
+  mutate(is_psps = ifelse(psps_hours>0, 1, 0))
 rm(psps_results, tmp); gc()
 
 #!! memory management
@@ -399,8 +400,6 @@ save(df_treatment, file='./intermediate/Regression Dataset/regression_dataset_fu
 # Clean up dataset 
 ################################################################################
 
-#load(file='./intermediate/Regression Dataset/regression_dataset_full.RData')
-
 # Ensure first treatment activity doesn't start in Jan 2018, but later in the fall
 df_treatment <- df_treatment %>%
   mutate(across(names(df_treatment)[grepl('evm', names(df_treatment))],
@@ -463,15 +462,14 @@ df$is_vegequip_ignition <- ifelse(df$is_veg_ignition==1 | df$is_equip_ignition==
                                   1, 0)
 
 # Cal Fire regions
-load(file='./intermediate_24/int_circuit_CALFIRE.RData')
+load(file='./data/Spatial Repository/int_circuit_CALFIRE.RData')
 df<-left_join(df, x)
 
-
-#### Edit wind direction
+# Edit wind direction
 df <- df %>%
   mutate(is_wind_north = ifelse((th>=315 | th<45), 1, 0),
          is_wind_east  = ifelse((th>=45 & th<135), 1, 0),
          is_wind_south = ifelse((th>=135 & th <225), 1, 0))
 
 # Save
-save(df, file='./intermediate_24/regression_dataset_clean_full_082024.RData')
+save(df, file='./intermediate/Regression Dataset/regression_dataset_clean_full.RData')
