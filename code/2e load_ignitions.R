@@ -225,18 +225,22 @@ df <- left_join(df, results)
 # Try to match on coordinates (lat/long)
 ################################################################################
 
+# Create spatial data
+df_spatial <- df %>%
+  st_as_sf(coords = c('longitude', 'latitude'),
+           crs=st_crs(4326))
+
+# Create id
+df_spatial$id<-1:nrow(df_spatial)
+
+# Run from scratch
 if (SWITCH_NEW_LOAD) {
+  
   # Load spatial data
-  load(file='./intermediate/PGE_circuits.RData')
-  
-  # Create spatial data
-  df_spatial <- df %>%
-    st_as_sf(coords = c('longitude', 'latitude'),
-             crs=st_crs(4326))
+  load(file='./intermediate/PGE_circuits.RData')  
+    
+  # Update projection
   df_spatial <- st_transform(df_spatial, st_crs(lines_OH))
-  
-  # Create id
-  df_spatial$id<-1:nrow(df_spatial)
   
   # Write function for lat/long matching
   matchLatLong <- function(check, lines) {
@@ -306,17 +310,12 @@ df <- df %>%
 
 # Note-- one ignition is not near any PG&E distribution lines
 
-
-################################################################################
-################################################################################
-# Check circuit name
-
 # Drop missing
 df <- df %>% 
   filter(!(is.na(circuit.name) & is.na(circuit.facility) & 
              is.na(circuit.spatial)))
 
-################################################################################
+
 ################################################################################
 # Identify 2022 ignitions that occurred during EPSS
 ################################################################################
@@ -447,7 +446,6 @@ tmp$index <- as.numeric(tmp$index)
 df <- left_join(df, tmp)
 
 ################################################################################
-################################################################################
 # Identify 2023 ignitions that occurred during EPSS
 ################################################################################
 
@@ -478,10 +476,10 @@ df <- df %>%
                                    1, 0))
 
 ################################################################################
+# Classify Ignitions
 ################################################################################
-# classify ignitions and prepare for saving
 
-save(df, file='./intermediate_24/ignition_tracker_new_2014_2023.RData')
+save(df, file='./intermediate/Intermediate Ignitions/ignition_tracker_2014_2023.RData')
 
 # All ignitions
 out <- df %>% 
@@ -539,4 +537,4 @@ fpi <- df %>%
 out <- left_join(out, fpi)
 
 ### Save for export
-save(out, file='./intermediate_24/revised_ignition_tracker.RData')
+save(out, file='./intermediate/ignition_tracker.RData')
