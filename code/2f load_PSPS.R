@@ -329,22 +329,20 @@ epss_results <- bind_rows(epss_results, epss_results_2023) %>%
   bind_rows(epss_results_2021) %>% 
   arrange(date)
 
-########################################################
-# Determine if any ignition occurred during PSPS event #
-########################################################
+##########################################################
+# Investigate if any ignition occurred during PSPS event #
+##########################################################
 
 # Load ignition tracker
-load('./intermediate/ignition_tracker_2014_2021.RData')
+load('./intermediate/Intermediate Ignitions/ignition_tracker_2014_2023.RData')
 
 # Select relevant variables
-df_ignitions <- df_ignitions %>% 
-  select(date,circuit.name,HFTD,
-         time,
-         wsd.driver, failure.driver:facility.contacted,
-         high.winds.warning, red.flag.warning, land.use.at.origin) %>% 
+df_ignitions <- df %>% 
+  select(date,circuit.name,hftd,
+         time, suspected.initiating.event, land.use.at.origin) %>% 
   mutate(hour.ignition=hour(time),
          minute.ignition=minute(time)) %>% 
-  rename(ignition_hftd=HFTD) %>% 
+  rename(ignition_hftd=hftd) %>% 
   select(-time)
 
 # Merge with PSPS data
@@ -374,13 +372,9 @@ tmp<-tmp %>%
 
 # Filter
 tmp<-tmp %>% 
-  #filter(is_psps_ignition==1) %>% 
   select(date, circuit.name, ignition_hftd, is_psps_ignition,
-         failure.sub.driver, land.use.at.origin, 
-         high.winds.warning, red.flag.warning) %>% 
-  rename(psps_ignition_cause=failure.sub.driver,
-         psps_ignition_redflag=red.flag.warning,
-         psps_ignition_highwind=high.winds.warning,
+         suspected.initiating.event, land.use.at.origin) %>% 
+  rename(psps_ignition_cause=suspected.initiating.event,
          psps_ignition_landuse=land.use.at.origin,
          psps_ignition_HFTD=ignition_hftd)
 
@@ -393,7 +387,7 @@ tmp<-tmp %>%
 # bring in 
 psps_results <- left_join(psps_results, tmp)
 
-## Prep to export ##
+# Prep to export #
 psps_results <- psps_results %>% 
   mutate(psps_customer_hours=outage.hours.expand*customers,
          psps_customer_hours_res=outage.hours.expand*customers.res,
@@ -404,29 +398,25 @@ psps_results <- psps_results %>%
          psps_customers=customers) %>% 
   select(date, circuit.name, psps_customer_hours:psps_customer_hours_other,
          psps_customers,
-         psps_hours,is_psps_ignition, psps_ignition_cause:psps_ignition_redflag,
+         psps_hours,is_psps_ignition, psps_ignition_cause:psps_ignition_landuse,
          psps_ignition_HFTD)
 
 # Save
-save(psps_results, file='./intermediate_24/psps_compiled_PGE.RData')
+save(psps_results, file='./intermediate/psps_compiled_PGE.RData')
 
+################################################################################
+# Organize EPSS / fast-trip data #
+################################################################################
 
-########################################################
-# Determine if any ignition occurred during EPSS event #
-########################################################
+# Note: ignitions occuring during fast-trip enablement are accounted for
+# in ignition file processing (2e load_ignitions.R)
 
 # Merge with EPSS data
 epss_results <- epss_results %>% 
   rename(circuit.name=Circuit)
-# epss<-left_join(epss_results, df_ignitions) %>% 
-#   group_by(circuit.name, date) %>% 
-#   mutate(count=n())
-# sum(!is.na(epss$facility.contacted))
-
 
 # Allocate customer minutes across days based on length
 epss_results <- epss_results %>% 
-  #filter(circuit.name=='SILVERADO 2102') %>% 
   group_by(`Customer Minutes`, circuit.name, Cause) %>% 
   mutate(outage.hours.expand.total=sum(outage.hours.expand),
          outage.hours.share=outage.hours.expand/outage.hours.expand.total,
@@ -441,7 +431,5 @@ epss_results <- epss_results %>%
          epss.customer.minutes:epss.customer.minutes.large.ci) %>% 
   arrange(date)
 
-
-
 # Save
-save(epss_results, file='./intermediate_24//epss_compiled_PGE_2023.RData')
+save(epss_results, file='./intermediate/epss_compiled_PGE.RData')

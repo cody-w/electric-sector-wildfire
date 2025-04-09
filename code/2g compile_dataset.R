@@ -1,16 +1,12 @@
 ################################################################################
-## File: Compile Dataset
+## Project: Ignitions
 ## Purpose: Stitch together ignitions, treatment data, and covariates
 ################################################################################
 
 # Load treatment data
-load(file='./intermediate_24/compiled_treatment_2014_2023.RData')
+load(file='./intermediate/compiled_treatment_2014_2023.RData')
 
-# #------ drop out sectionalization devices
-# df_treatment <- df_treatment %>% 
-#   select(-`sectionalization_devices_hftd-2`:-`sectionalization_devices_non-hftd`)
-
-#------ change names
+# change names
 df_treatment <- df_treatment %>% 
   mutate(circuit.name=gsub('NEWARK 12KV', 'NEWARK', circuit.name),
          circuit.name=gsub('NEWARK 21KV', 'NEWARK', circuit.name))
@@ -27,7 +23,7 @@ x<-mean(df_treatment$conductor_year, na.rm=T)
 df_treatment <- df_treatment %>% 
   mutate(conductor_year=ifelse(is.na(conductor_year), x, conductor_year))
 
-# Transform to age based off of 2019 year
+# Index age based to 2019 (could pick any base year)
 df_treatment$conductor_age<- 2019-df_treatment$conductor_year
 
 rm(circuit_data, tmp2); gc()
@@ -36,7 +32,7 @@ rm(circuit_data, tmp2); gc()
 # Bring in PSPS information #
 #############################
 
-load('./intermediate_24/psps_compiled_PGE.RData')
+load('./intermediate/psps_compiled_PGE.RData')
 
 # Merge with main dataset
 df_treatment <- left_join(df_treatment, psps_results)
@@ -44,34 +40,20 @@ df_treatment <- left_join(df_treatment, psps_results)
 # Set to zero if NA for PSPS
 df_treatment <- df_treatment %>% 
   mutate(across(psps_customer_hours:is_psps_ignition, ~ifelse(is.na(.), 0, .)))
-
-# Create 'sectionalized' version of psps
-df_treatment <- df_treatment %>%
-  mutate(is_psps_section = ifelse(psps_hours>0, 1, 0),
-         is_psps_section = ifelse(psps_ignition_highwind=='N' &
-                                    psps_ignition_redflag=='N' & year<2021, 0, is_psps_section),
-         is_psps_section = ifelse(psps_ignition_landuse=='Urban' & year<2021, 0, is_psps_section),
-         is_psps_section = ifelse(psps_ignition_HFTD=='Non-HFTD' & year<2021, 0, is_psps_section),
-         is_psps = ifelse(psps_hours>0, 1, 0),
-         is_psps_section = ifelse(is.na(is_psps_section) & is_psps==1, 1, is_psps_section),
-         is_psps_section = ifelse(is.na(is_psps_section), 0, is_psps_section))
-
 rm(psps_results, tmp); gc()
-
 
 #!! memory management
 df_treatment <- df_treatment %>% 
   select(-psps_customers, -psps_hours,
          -psps_ignition_cause, -psps_ignition_landuse,
-         -psps_ignition_highwind, -psps_ignition_redflag,
          -psps_ignition_HFTD); gc()
 
 ################################################################################
-# Bring in EPSS information ####################################################
+# Bring in EPSS information 
 ################################################################################
 
 # Load
-load(file='./intermediate_24/epss_compiled_PGE_2023.RData')
+load(file='./intermediate/epss_compiled_PGE.RData')
 
 # Consolidate
 epss_results <- epss_results %>% 
@@ -89,53 +71,19 @@ df_treatment <- df_treatment %>%
   mutate(across(contains('epss'), ~ifelse(is.na(.), 0, .))) %>%
   mutate(is_epss = ifelse(epss.customer.hours>0, 1, 0))
 
-rm(epss_results)
+rm(epss_results); gc()
 
-##############################################
-# Drop 2014 now
-##############################################
+################################################################################
+# Drop 2014 given incomplete ignition data
+################################################################################
 
 df_treatment <- df_treatment %>%
   filter(year>2014)
 gc()
 
-#######################
-# Bring in covariates #
-#######################
-
-# Weather vars to compile/merge
-weather_vars <- c('vpd', 'rmin', 'fm100', 'fm1000',
-                  'tmmx', 'pr', 'vs', 'th',
-                  'erc', 'etr', 'srad', 'sph', 'pet')
-
-# Write function
-loadWeatherVars <- function(w_var) {
-  
-  # Load
-  load(paste0('./intermediate_24/compiled_', w_var, '_2023.RData'))
-  tmp <- out_results
-  load(paste0('./intermediate/compiled_', w_var, '_2021.RData'))
-  out_results <- bind_rows(out_results,tmp)
-  
-  save(out_results, 
-       file=paste0('./Clone/electric-sector-wildfire/intermediate/Intermediate GridMET/compiled_',
-                   w_var, '.RData'))
-  
-}
-
-# Run function
-for(i in 1:length(weather_vars)) {
-  print(i)
-  print(weather_vars[i])
-  
-  # Execute
-  loadWeatherVars(weather_vars[i]) 
-  gc()
-}
-
-#######################
-# Bring in covariates #
-#######################
+################################################################################
+# Bring in weather covariates #
+################################################################################
 
 # Weather vars to compile/merge
 weather_vars <- c('vpd', 'rmin', 'fm100', 'fm1000',
@@ -146,10 +94,7 @@ weather_vars <- c('vpd', 'rmin', 'fm100', 'fm1000',
 loadWeatherVars <- function(df, w_var, dt_start, dt_end) {
   
   # Load
-  load(paste0('./intermediate_24/compiled_', w_var, '_2023.RData'))
-  tmp <- out_results
-  load(paste0('./intermediate/compiled_', w_var, '_2021.RData'))
-  out_results <- bind_rows(out_results,tmp)
+  load(paste0('./intermediate/Intermediate GridMET/compiled_', w_var, '.RData'))
   
   # Create date range
   dt_range <- seq(dt_start, dt_end, 1)
@@ -182,26 +127,26 @@ for(i in 1:length(weather_vars)) {
 
 
 # ~~~~~~~~~~~~~~~ELEVATION
-load('./intermediate/compiled_elevation.RData')
+load('./intermediate/Intermediate GridMET/compiled_elevation.RData')
 
 # Merge
 df_treatment <- left_join(df_treatment, out_data)
-rm(out_data, out_results); gc()
+rm(out_data); gc()
 
 # ~~~~~~~~~~~~~~~Vegetation height
-load('./intermediate_24/vegetation_height_2014_2023.RData')
+load('./intermediate/Intermediate Vegetation/vegetation_height_2014_2023.RData')
 
 # Merge
 df_treatment <- left_join(df_treatment, results)
 rm(results);gc()
 
-##################################
-# Bring in REVISED ignition data #
-##################################
+################################################################################
+# Bring in  ignition data #
+################################################################################
 
-load('./intermediate_24/revised_ignition_tracker.RData')
+load('./intermediate/ignition_tracker.RData')
 
-# Edit circuit names that don't match 
+# Edit names / manual matches
 out <- out %>% 
   mutate(circuit.name=ifelse(circuit=='ANYTA 1106', 'ANITA 1106',
                              circuit),
@@ -334,9 +279,6 @@ out<-out %>%
             is_equip_ignition=sum(is_equip_ignition),
             is_hftd_ignition=sum(is_hftd_ignition))
 
-unique(out$circuit.name)[!(unique(out$circuit.name) %in%
-                             unique(df_treatment$circuit.name))]
-
 # Merge in
 df_treatment <- left_join(df_treatment, out, by=c('circuit.name'='circuit.name',
                                                   'date'='date'))
@@ -348,17 +290,11 @@ df_treatment <- df_treatment %>%
            is_equip_ignition=ifelse(is.na(is_equip_ignition), 0, is_equip_ignition),
            is_hftd_ignition=ifelse(is.na(is_hftd_ignition), 0, is_hftd_ignition))
 
-#######################################
-# Adjust treatment data to cumulative #
-#######################################
+################################################################################
+# Adjust treatment data to cumulative
+################################################################################
 
-# # Drop some vars for memory management
-# df_treatment <- df_treatment %>% 
-#   select(-(`Transformer Climate Zone_R`:`Transformer Climate Zone_X`),
-#          -(`Support Structure Material_ALM`:`Support Structure Material_WOST`),
-#          -(`PriOH Conductor Construction Type_1.0`:`OH Conductor Material Proportion_Null`),
-#          -is_dup, -count)
-# gc()
+gc()
 
 # Write function
 adjustCumulativeValues <- function(input_data, input_var) {
@@ -366,11 +302,9 @@ adjustCumulativeValues <- function(input_data, input_var) {
   # Variables to grab
   grab_vars <- c('circuit.name', 'year', input_var)
   
-  # Find ending values in 2018-2021 to adjust starting values 2019-2022
+  # Find ending values in 2018-2022 to adjust starting yearly values 2019-2023
   tmp <- input_data %>% 
     select(-conductor_year) %>% 
-    # select(-conductor_year,
-    #        -evm_progress, -evm_progress_intp) %>% 
     select(matches(paste(c(grab_vars, 'date'), collapse='|'))) %>% 
     filter(year==2018 | year==2019 | year==2020 | year==2021 | year==2022) %>% 
     filter(month(date)==12 & day(date)==31) %>% 
@@ -399,7 +333,8 @@ adjustCumulativeValues <- function(input_data, input_var) {
 }
 
 # Loop throgh each var and adjust
-pos1 <- which(names(df_treatment)=='evm_hftd-2')
+#pos1 <- which(names(df_treatment)=='evm_hftd-2')
+pos1 <- which(names(df_treatment)=='covered_conductor_hftd-2')
 pos2 <- which(names(df_treatment)=='underground_non-hftd')
 adj_vars <- names(df_treatment)[pos1:pos2]
 
@@ -433,10 +368,7 @@ df_treatment <- df_treatment %>%
          poles_hftd       = `poles_replaced_hftd-2` + `poles_replaced_hftd-3`,
          poles_units      = poles_hftd + `poles_replaced_non-hftd`,
          underground_hftd = `underground_hftd-2` + `underground_hftd-3`,
-         underground_units = underground_hftd + `underground_non-hftd`,
-         # Sectionalizers
-         sectionalizers_hftd  = `sectionalization_devices_hftd-2` + `sectionalization_devices_hftd-3`,
-         sectionalizers_units = sectionalizers_hftd + `sectionalization_devices_non-hftd`)
+         underground_units = underground_hftd + `underground_non-hftd`)
 
 # Calculate as shares
 df_treatment <- df_treatment %>% 
@@ -461,17 +393,15 @@ df_treatment <- df_treatment %>%
   select(-(`overhead_inspections_hftd-2`:`overhead_inspections_non-hftd`)) %>% 
   select(-(`evm_other-hftd`:`sectionalization_devices_other-hftd`))
 gc()
-#save(df_treatment, file='./intermediate_24/regression_dataset_full_082024.RData')
-
+save(df_treatment, file='./intermediate/Regression Dataset/regression_dataset_full.RData')
 
 ################################################################################
 # Clean up dataset 
-# 
 ################################################################################
 
-load(file='./intermediate_24/regression_dataset_full_082024.RData')
+#load(file='./intermediate/Regression Dataset/regression_dataset_full.RData')
 
-# Ensure treatment activity doesn't start in Jan 2018, but later in the fall
+# Ensure first treatment activity doesn't start in Jan 2018, but later in the fall
 df_treatment <- df_treatment %>%
   mutate(across(names(df_treatment)[grepl('evm', names(df_treatment))],
                 ~ ifelse(date<'2018-09-17', 0, .))) %>%
@@ -486,11 +416,7 @@ df_treatment <- df_treatment %>%
 df <- df_treatment
 rm(df_treatment); gc()
 
-
-###############################################
-# Change raw units to more manageable numbers #
-###############################################
-
+# Change raw units to more manageable units #
 df<-df %>%
   mutate(evm_units=evm_units/100,
          covered_units=covered_units/100,
@@ -510,13 +436,8 @@ df<-df %>%
          conductor_age=conductor_age/10,
          elevation=elevation/1000)
 
-###########################$
-# Additional data cleaning #
-############################
 
-# # Exclude PSPS problem children
-# df <- df %>%
-#   filter(!(is_ignition>=1 & is_psps==1)) 
+# Additional data cleaning #
 
 # Ensure EPSS ignitions are accounted for
 df <- df %>% 
@@ -540,13 +461,8 @@ df <- df %>%
 # Add veg + equip ignition
 df$is_vegequip_ignition <- ifelse(df$is_veg_ignition==1 | df$is_equip_ignition==1,
                                   1, 0)
-# Grab calfire regions
-# load('./intermediate/regression_dataset_clean_full_090123.Rdata')
-# x <- df %>%
-#   filter(date=='2020-12-30') %>%
-#   filter(hftd_share>0.01) %>%
-#   select(circuit.name, region)
-# save(x, file='./intermediate_24/int_circuit_CALFIRE.RData')
+
+# Cal Fire regions
 load(file='./intermediate_24/int_circuit_CALFIRE.RData')
 df<-left_join(df, x)
 

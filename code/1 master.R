@@ -65,8 +65,6 @@ plot_text <- 'Open Sans'
 theme_matplotlib <- function () { 
   theme_bw(base_size=30, base_family = plot_text) %+replace% 
     theme(
-      #panel.background  = element_blank(),
-      #plot.background   = element_rect(fill=NA, colour=NA), 
       legend.background = element_rect(fill="transparent", colour=NA),
       legend.key        = element_rect(fill="transparent", colour=NA),
       legend.text       = element_text(size=36),
