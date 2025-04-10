@@ -1,6 +1,6 @@
 ################################################################################
-# Risk score module 
-# Date: Sep 4, 2023
+## Project: Ignitions
+## Purpose: Match treat/control, run regression models
 ################################################################################
 
 # Load dataset
