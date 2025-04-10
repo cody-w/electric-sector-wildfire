@@ -594,9 +594,6 @@ save(tmp_notrip, tmp_lo_notrip, tmp_hi_notrip,
      tmp, tmp_lo, tmp_hi,
      file='./intermediate/Intermediate Cost-Effectiveness/monte_structure.RData')
 
-
-
-
 ################################################################################
 # PLOT COST CURVE ---------------------------------------------------------
 # Structure BASIS
