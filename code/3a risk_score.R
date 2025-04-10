@@ -7,12 +7,6 @@
 load(file='./intermediate/Regression Dataset/regression_dataset_clean_full.RData')
 options(dplyr.summarise.inform = FALSE)
 
-# # Load doses
-# load(file='./intermediate_24/dose2.RData')
-# Merge in to dataset
-# df <- left_join(df, dose)
-# rm(dose);gc()
-
 # Write function to clean up and prep for prediction model
 prepData <- function(data, IGN_TYPE='VEG',
                      HIST_IGN=T, W_VARS, H_VARS, O_VARS,
@@ -101,10 +95,6 @@ p_covars <- c(w_vars, tier_length_keep, h_vars, o_vars, 'total.ug.miles')
 reg_data <- prepData(df, IGN_TYPE = 'VEG', HIST_IGN = T,
                      W_VARS = w_vars, H_VARS = h_vars, O_VARS = o_vars,
                      HFTD_SHARE = h_share)
-
-# ### Bring in fitted fire potential index
-# load('./intermediate_24/fitted_fpi_forest_082024.RData')
-# reg_data <- left_join(reg_data, out)
 
 ################################################################################
 # Full forest model 

@@ -205,7 +205,7 @@ for(j in c(2,1,5,8,4,7)) {
 # Set to NA if zero
 names(df_treatment) <- tolower(names(df_treatment))
 df_treatment <- df_treatment %>% 
-  mutate_at(vars(`evm_hftd-2`:`sectionalization_devices_non-hftd`),
+  mutate_at(vars(`covered_conductor_hftd-2`:`sectionalization_devices_non-hftd`),
             function(x){ifelse(is.na(x), 0, x)})
 
 # Bring in distribution of veg management projects weekly - 2020
@@ -437,15 +437,14 @@ df_treatment <- df_treatment %>%
 # Apply
 df_treatment <- df_treatment %>% 
   mutate(across(`evm_hftd-2`:`evm_non-hftd`, ~.x * evm_progress_intp)) %>% 
-  mutate(across(`covered_conductor_hftd-2`:`sectionalization_devices_non-hftd`, ~.x * hard_progress_intp))
+  mutate(across(`covered_conductor_hftd-2`:`covered_conductor_non-hftd`, ~.x * hard_progress_intp)) %>% 
+  mutate(across(`poles_replaced_hftd-2`:`sectionalization_devices_non-hftd`, ~.x * hard_progress_intp))
 
 # Export
 save(df_treatment, file='./intermediate/Intermediate Hardening Data/compiled_treatment_data.RData')
 
 ################################################################################
-#
 # 2021 and 2022 data processing ################################################
-#
 ################################################################################
 
 # Load 2021 file
@@ -554,6 +553,7 @@ reshapeGridData <- function(df) {
   
   ##################################################################
   # Bring in distribution of veg management projects weekly - 2021
+  ##################################################################
   df_dist2021 <- read_excel('./intermediate/Workbooks/Temporal Hardening Distribution.xlsx',
                             sheet='2021', skip=6) %>% 
     select(week_ending...1, evm_miles_cum)
@@ -579,9 +579,9 @@ reshapeGridData <- function(df) {
   # Bring in EVM progress distribution to treatment data
   df_treatment <- left_join(df_treatment, pdata)
   
-  
-  #########################################################
-  #~~~~~~~~~~~ REPEAT PROCESS FOR SYS HARDENING ~~~~~~~~~~#
+  ###########################################################
+  # Repeat process for interpolating system hardening
+  ###########################################################
   
   # Bring in distribution of sys hardening projects weekly - 2021
   df_dist2021 <- read_excel('./intermediate/Workbooks/Temporal Hardening Distribution.xlsx',
@@ -699,7 +699,7 @@ save(df_treatment, file='./intermediate/Intermediate Hardening Data/compiled_tre
 # Get average tree density across 2020-21 #
 ###########################################
 
-####### BRING IN 2020
+# BRING IN 2020
 
 # Load data on grid hardening
 df <- read_excel(path='./data/PGE/2021 WMP/Data Requests/CalAdvocates_035 (2021WMP-01)/WildfireMitigationPlans_DR_CalAdvocates_035-Q04-Atch01.xlsx',
@@ -893,6 +893,7 @@ reshapeGridData2022 <- function(df) {
   ##################################################################
   # Bring in distribution of veg management projects weekly - 2021
   # use 2021 distribution, ***assume representative
+  ##################################################################
   df_dist2021 <- read_excel('./intermediate/Workbooks/Temporal Hardening Distribution.xlsx',
                             sheet='2021', skip=6) %>% 
     select(week_ending...1, evm_miles_cum)
@@ -920,8 +921,9 @@ reshapeGridData2022 <- function(df) {
   df_treatment <- left_join(df_treatment, pdata)
   
   
-  #########################################################
-  #~~~~~~~~~~~ REPEAT PROCESS FOR SYS HARDENING ~~~~~~~~~~#
+  ###########################################################
+  # Repeat process for interpolating system hardening
+  ###########################################################
   
   # Bring in distribution of sys hardening projects weekly - 2021
   df_dist2021 <- read_excel('./intermediate/Workbooks/Temporal Hardening Distribution.xlsx',
@@ -1037,7 +1039,7 @@ save(df_2022, file='./intermediate/Intermediate Hardening Data/compiled_2022_tre
 
 load('./intermediate/Intermediate Hardening Data/compiled_treatment_2014_2021.RData')
 df_treatment<-bind_rows(df_treatment, df_2022)
-save(df_treatment, file='./intermediate/compiled_treatment_2014_2022.RData')
+save(df_treatment, file='./intermediate/Intermediate Hardening Data/compiled_treatment_2014_2022.RData')
 
 ################################################################################
 # LOAD 2023 data
@@ -1267,4 +1269,4 @@ df_2023 <- df_2023 %>%
 
 load('./intermediate/Intermediate Hardening Data/compiled_treatment_2014_2022.RData')
 df_treatment<-bind_rows(df_treatment, df_2023)
-save(df_treatment, file='./intermediate/compiled_treatment_2014_2023.RData')
+save(df_treatment, file='./intermediate/Intermediate Hardening Data/compiled_treatment_2014_2023.RData')

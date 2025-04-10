@@ -4,7 +4,7 @@
 ################################################################################
 
 # Load treatment data
-load(file='./intermediate/compiled_treatment_2014_2023.RData')
+load(file='./intermediate/Intermediate Hardening Data/compiled_treatment_2014_2023.RData')
 
 # change names
 df_treatment <- df_treatment %>% 
