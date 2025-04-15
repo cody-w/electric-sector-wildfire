@@ -488,7 +488,6 @@ graph_acres <- df %>%
 graph_acres[graph_acres$hftd=='HFTD' & graph_acres$ign_type=='Veg' & 
               !is.na(graph_acres$hftd),'acreage.sum'] / sum(graph_acres$acreage.sum)
 
-
 # Transmission ignitions share
 dist  <- c(401, 411, 477)
 trans <- c(22, 23, 24)
