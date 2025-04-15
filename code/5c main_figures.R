@@ -1,18 +1,14 @@
 ################################################################################
-##
 ## Project: Ignitions
-## Date:    September 4, 2024
-## File:    Figures
 ## Purpose: Create key figures, mainly cost-effectiveness bar plots 
-##
 ################################################################################
 
 # Cost per avoided ignition -----------------------------------------------
 
 # Load scenarios
-load('./intermediate_24/scenarios_veg_Nov2024.RData')
-load('./intermediate_24/scenarios_undg_Nov2024.RData')
-load('./intermediate_24/scenarios_operational.RData')
+load('./intermediate/Intermediate Cost-Effectiveness/scenarios_veg.RData')
+load('./intermediate/Intermediate Cost-Effectiveness/scenarios_undg.RData')
+load('./intermediate/Intermediate Cost-Effectiveness/scenarios_operational.RData')
 
 # Get base vegetation management scenario
 graph <- cost_veg %>% 
@@ -446,8 +442,6 @@ graph_error_wide$point_type <- factor(graph_error_wide$point_type,
 
 
 # Colors
-### Format graph
-pal <- c("#DFC27D", "#A6611A", "#80CDC1", "#80CDC1", "#018571")
 pal <- c("#DFC27D", "#A6611A", "#80CDC1", "#018571")
 
 # Color scheme
@@ -465,57 +459,8 @@ col_three <- "#53A21A"
 col_four <- "#1B3508"
 
 ################################################################################
-################################################################################
-############ Plot cost per avoided ignition
-################################################################################
-
-ggplot() +
- # Bar plots
-  geom_bar(data=graph %>%
-             filter(label=='Cost per avoided ignition') %>% 
-             filter(category != 'ug social'),
-           aes(x=label_y, y=(cost_ign/1E6),
-               fill=label_y),
-           stat='identity', show.legend = F) +
-  # Error bars
-  geom_errorbar(data=graph_error_wide %>% 
-                  filter(key=='cost_ign') %>% 
-                  filter(label !='ug social'),
-                aes(x=label_y, ymin=(Lower/1E6),
-                    ymax=(Higher/1E6),
-                    color=point_type,
-                    linetype=point_type),
-                width=0.75, linewidth=0.5,
-                position='dodge') +
-  theme_matplotlib() +
-  theme(axis.title=element_text(lineheight=unit(0.3, 'cm')), 
-        legend.text = element_text(size=30, lineheight = unit(0.3, 'cm')),
-        legend.box.just = 'left',
-        legend.box = 'horizontal',
-        legend.spacing = unit(0.75, 'cm'),
-        legend.margin = margin(),
-        legend.title = element_text(size=32),
-        legend.position = 'right',
-        legend.background = element_rect(fill=alpha('white', alpha=0.7)),
-        axis.text.x = element_text(lineheight = 0.35)) +
-  # Axis and colors
-  scale_fill_manual(values = pal) +
-  guides(fill=F, color=guide_legend(ncol=1)) +
-  scale_color_manual(name='Sensitivity',
-                     values=c(col_one, '#13447C', col_two,
-                              "#DFC27D", brbg_pal[1], col_three)) +
-  scale_linetype_manual(name='Sensitivity',
-                        values=c(rep('solid', 5), rep('solid', 2))) +
-  labs(x='', y='Cost per Avoided Ignition\n$2023 Millions') +
-  coord_cartesian(ylim=c(0,76)) +
-  scale_y_continuous(expand=c(0,0))
-ggsave('./plots/plots_updated/cost_avoided_ignition.png', w=9, h=6, units='in') 
-
-################################################################################
-################################################################################
 ############ Plot cost per avoided structure
 ################################################################################
-
 
 ggplot() +
   # Bar plots
@@ -557,30 +502,7 @@ ggplot() +
   labs(x='', y='Cost per Avoided Structure Burned\n$2023 Millions') +
   coord_cartesian(ylim=c(0,9.1)) +
   scale_y_continuous(expand=c(0,0))
-ggsave('./plots/plots_updated/cost_avoided_structure.png', w=9, h=6, units='in') 
-
-
-### Quick calc on excess returns
-x1 <- graph %>% 
-  filter(label=='Cost per avoided structure burned') %>% 
-  filter(category=='ug ratepayer')
-x2 <- graph_error_wide %>% 
-  filter(key=='cost_struct') %>% 
-  filter(label=='ug ratepayer') %>% 
-  filter(point_type=='Discount Rate &\nCost of Capital')
-round((x2$Lower - x1$cost_ign) / x1$cost_ign * 100, 1)
-
-### More on total $ cost difference for excess returns
-x1 <- cost_undg %>% 
-  filter(r_disc==median(r_disc) & 
-           ug_horizon==median(ug_horizon) &
-           unit_cost==median(unit_cost) &  
-           risk_range==median(r_range))
-x2 <- cost_undg %>% 
-  filter(r_disc==min(r_disc) & 
-           ug_horizon==median(ug_horizon) &
-           unit_cost==median(unit_cost) &  
-           risk_range==median(r_range))
+ggsave('./plots/Main figures/cost_avoided_structure.png', w=9, h=6, units='in') 
 
 
 ###########################################################################
@@ -588,25 +510,19 @@ x2 <- cost_undg %>%
 ###########################################################################
 
 # Load dataset
-load(file='./intermediate_24/reg_data_for_bootstrap_Aug2024.RData')
+load(file='./intermediate/Regression Dataset/reg_matched_data.RData')
 
 # Load reg models
-load(file='./intermediate_24/rscore_models_Aug2024.RData')
+load(file='./intermediate/Regression Dataset/rscore_models.RData')
 rm(mm_risk_match_high, mm_risk_match_high2,
    mm_risk_match_mod, mm_risk_match_mod2,
    mm_risk_r3_high,
    mm_risk_r3_mod, mm_risk_r3_mod2); gc()
 
-##################
-# Write function
-##################
+###############################################################
+# Write function to calculate avoided ignitions for plotting
+###############################################################
 avoidIgnitions <- function(in_dat, in_model) {
-  
-  # # Initialize
-  # in_dat <- pdata %>%
-  #   filter(is_r3==1) %>%
-  #   mutate(underground_units=underground_units*10)
-  # in_model  <- mm_risk_r3_high2
 
   # Get base ignitions
   ign_base <- predict(in_model, newdata = in_dat %>% 
@@ -683,7 +599,7 @@ avoidIgnitions <- function(in_dat, in_model) {
 # Run function
 df_avoid <- avoidIgnitions(in_dat = pdata %>% 
                              filter(is_r3==1) %>% 
-                             mutate(underground_units=underground_units*10), 
+                             mutate(underground_units=underground_units), 
                            in_model = mm_risk_r3_high2)
 
 
@@ -722,7 +638,6 @@ graph2 <- graph2 %>%
   select(year, month, ign_obs, ign_base, is_ignition) %>% 
   group_by(year, month) %>% 
   summarise_all(sum)
-
 
 # Plot avoided ignitions at observed levels
 ss <- 2
@@ -801,4 +716,4 @@ ggplot() +
   geom_text(data=annotext3, aes(x=x, y=y, label=label),
             size=9, color='black', hjust=1, lineheight=0.25) +
   coord_cartesian(ylim=c(0, 26))
-ggsave('./plots/plots_updated/avoided_ignitions_modeled_R3.png', w=9, h=6, units='in')
+ggsave('./plots/Main figures/avoided_ignitions_modeled_R3.png', w=9, h=6, units='in')

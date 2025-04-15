@@ -429,7 +429,6 @@ monteCarlo <- function(
     # Get paramaters for current draw
     tmp_param <- params %>% filter(draw==i)
     
-    
     ### Loop through buildings per acre ###
     draw_damages <- data.frame()
     for(g in 1:nrow(in_damages)) {
@@ -482,6 +481,7 @@ monteCarlo <- function(
       ### Combine cost-effectiveness ###
       main_tmp <- costEffectiveness(in_struct=df_struct, in_cost=df_cost,
                                     ignition_rank = ignit_switch)
+      
     } else if (fast_trip_switch==T) {
       df_struct <- estimateUndergroundingBenefit(in_panel=panel,
                                                  disc_rate = disc,
@@ -889,4 +889,4 @@ ggplot(data=monte, aes(x=running_hftd/1E3,
   scale_y_continuous(expand=c(0.01,0.01)) +
   scale_x_continuous(expand=c(0,0), breaks=seq(0, 25, 4)) +
   coord_cartesian(ylim=c(0,20), xlim=c(0.3, 24))
-ggsave('./plots/plots_updated/damage_curve_structure.png', w=8, h=5)
+ggsave('./plots/Main figures/damage_curve_structure.png', w=8, h=5)
