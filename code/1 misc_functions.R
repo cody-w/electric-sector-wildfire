@@ -5,83 +5,6 @@
 ##
 ################################################################################
 
-# CALFIRE REGIONS
-tmp <- data.frame(unitcode=c('AEU',
-                             'BEU',
-                             'BTU',
-                             'CZU',
-                             'FKU',
-                             'HUU',
-                             'LMU',
-                             'LNU',
-                             'MEU',
-                             'MMU',
-                             'MRN', ### Adding MARIN to Sonoma-Napa
-                             'NEU',
-                             'SBC', ### Adding SBC to Central Coast
-                             'SCU',
-                             'SHU',
-                             'SLU', ### Adding San Luis Obisbo to Central Coast
-                             'SKU',
-                             'TCU',
-                             'TGU'),
-                  region=c('Amador-El Dorado',
-                           'San Benito-Monterey',
-                           'Butte',
-                           'San Mateo-Santa Cruz',
-                           'Fresno-Kings',
-                           'Humboldt-Del Norte',
-                           'Lassen-Modoc',
-                           'Sonoma-Lake-Napa',
-                           'Mendocino',
-                           'Madera-Mariposa',
-                           'Sonoma-Lake-Napa', # Entry for Marin
-                           'Nevada-Yuba-Placer',
-                           'San Benito-Monterey', # Entry for Santa Barbara
-                           'Santa Clara',
-                           'Shasta-Trinity',
-                           'San Benito-Monterey', # Entry for San Luis Obisbo
-                           'Siskiyou',
-                           'Tuolumne-Calaveras',
-                           'Tehama-Glenn'))
-
-# Create hierarchy
-tmp2 <- data.frame(region=c('Amador-El Dorado',
-                            'San Benito-Monterey',
-                            'Butte',
-                            'San Mateo-Santa Cruz',
-                            'Fresno-Kings',
-                            'Humboldt-Del Norte',
-                            'Lassen-Modoc',
-                            'Sonoma-Lake-Napa',
-                            'Mendocino',
-                            'Madera-Mariposa',
-                            'Nevada-Yuba-Placer',
-                            'Santa Clara',
-                            'Shasta-Trinity',
-                            'Siskiyou',
-                            'Tuolumne-Calaveras',
-                            'Tehama-Glenn'),
-                   region_agg=c('Northern Sierra',
-                                'Central Coast',
-                                'Northern Sierra',
-                                'Central Coast',
-                                'Southern Sierra',
-                                'Northern Coast',
-                                'Southern Cascades',
-                                'Sonoma-Napa',
-                                'Northern Coast',
-                                'Southern Sierra',
-                                'Northern Sierra',
-                                'Central Coast',
-                                'Southern Cascades',
-                                'Southern Cascades',
-                                'Northern Sierra',
-                                'Southern Cascades'))
-calfire_region <- left_join(tmp, tmp2)
-
-
-
 # ROBUST ERRORS
 robustErrors <- function(model) {
   
@@ -191,33 +114,28 @@ combineEffect2 <- function(m, in_se) {
 
 #--- treatment labels
 treatment <- paste( 'evm_units',
-                    #'poles_units',
                     'underground_units',
                     'covered_units',
                     'is_psps_section',
                     'is_epss',
                     sep=' + ')
 treatment_hftd <- paste( 'evm_hftd',
-                         #'poles_hftd',
                          'underground_hftd',
                          'covered_hftd',
                          'is_psps_section',
                          sep=' + ')
 treatment_share <- paste( 'evm_share',
-                          #'poles_share', 
                           'underground_share',
                           'covered_share',
                           'is_psps_section',
                           sep=' + ')
 treatment_hftd_share <- paste( 'evm_hftd_share',
-                               #'poles_hftd_share', 
                                'underground_hftd_share',
                                'covered_hftd_share',
                                'is_psps_section',
                                sep=' + ')
 # covariate labels
 treatment_labels <- c('Enhc. veg. (00s miles)',
-                      #'Poles replaced (00s poles)',
                       'Undrgnd. (00s miles)',
                       'Cov. cond. (00s miles)',
                       'PSPS (binary)',
@@ -261,3 +179,120 @@ tier_length_keep <- str_split(tier_length, ' \\+ ')[[1]]
 enviro_vars_keep <- str_split(enviro_vars, ' \\+ ')[[1]]
 
 risk_label <- c('Risk score ($\\theta$)')
+
+
+
+# CALFIRE REGIONS
+c_reg<-data.frame(unitcode=c('AEU',
+                             'BEU',
+                             'BTU',
+                             'CZU',
+                             'FKU',
+                             'HUU',
+                             'LMU',
+                             'LNU',
+                             'MEU',
+                             'MMU',
+                             'MRN', 
+                             'NEU',
+                             'SBC', 
+                             'SCU',
+                             'SHU',
+                             'SLU', 
+                             'SKU',
+                             'TCU',
+                             'TGU'),
+                  region=c('Amador-El Dorado',
+                           'San Benito-Monterey',
+                           'Butte',
+                           'San Mateo-Santa Cruz',
+                           'Fresno-Kings',
+                           'Humboldt-Del Norte',
+                           'Lassen-Modoc',
+                           'Sonoma-Lake-Napa',
+                           'Mendocino',
+                           'Madera-Mariposa',
+                           'Marin County',
+                           'Nevada-Yuba-Placer',
+                           'Santa Barbara County', 
+                           'Santa Clara',
+                           'Shasta-Trinity',
+                           'San Luis Obispo Unit', 
+                           'Siskiyou',
+                           'Tuolumne-Calaveras',
+                           'Tehama-Glenn'))
+
+# MODIFIED CALFIRE REGIONS (marin, santa barbara, slo)
+tmp <- data.frame(unitcode=c('AEU',
+                             'BEU',
+                             'BTU',
+                             'CZU',
+                             'FKU',
+                             'HUU',
+                             'LMU',
+                             'LNU',
+                             'MEU',
+                             'MMU',
+                             'MRN', ### Adding MARIN to Sonoma-Napa
+                             'NEU',
+                             'SBC', ### Adding SBC to Central Coast
+                             'SCU',
+                             'SHU',
+                             'SLU', ### Adding San Luis Obisbo to Central Coast
+                             'SKU',
+                             'TCU',
+                             'TGU'),
+                  region=c('Amador-El Dorado',
+                           'San Benito-Monterey',
+                           'Butte',
+                           'San Mateo-Santa Cruz',
+                           'Fresno-Kings',
+                           'Humboldt-Del Norte',
+                           'Lassen-Modoc',
+                           'Sonoma-Lake-Napa',
+                           'Mendocino',
+                           'Madera-Mariposa',
+                           'Sonoma-Lake-Napa', # Entry for Marin
+                           'Nevada-Yuba-Placer',
+                           'San Benito-Monterey', # Entry for Santa Barbara
+                           'Santa Clara',
+                           'Shasta-Trinity',
+                           'San Benito-Monterey', # Entry for San Luis Obisbo
+                           'Siskiyou',
+                           'Tuolumne-Calaveras',
+                           'Tehama-Glenn'))
+
+# Create broader regional groups, too
+tmp2 <- data.frame(region=c('Amador-El Dorado',
+                            'San Benito-Monterey',
+                            'Butte',
+                            'San Mateo-Santa Cruz',
+                            'Fresno-Kings',
+                            'Humboldt-Del Norte',
+                            'Lassen-Modoc',
+                            'Sonoma-Lake-Napa',
+                            'Mendocino',
+                            'Madera-Mariposa',
+                            'Nevada-Yuba-Placer',
+                            'Santa Clara',
+                            'Shasta-Trinity',
+                            'Siskiyou',
+                            'Tuolumne-Calaveras',
+                            'Tehama-Glenn'),
+                   region_agg=c('Northern Sierra',
+                                'Central Coast',
+                                'Northern Sierra',
+                                'Central Coast',
+                                'Southern Sierra',
+                                'Northern Coast',
+                                'Southern Cascades',
+                                'Sonoma-Napa',
+                                'Northern Coast',
+                                'Southern Sierra',
+                                'Northern Sierra',
+                                'Central Coast',
+                                'Southern Cascades',
+                                'Southern Cascades',
+                                'Northern Sierra',
+                                'Southern Cascades'))
+calfire_region <- left_join(tmp, tmp2)

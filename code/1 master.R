@@ -1,14 +1,12 @@
 ################################################################################
-##
 ## File:    Master script
 ## Purpose: Source analysis 
-##
 ################################################################################
 
 # Setup
 rm(list=ls(all=T)); gc()
 
-# Set directory
+# Set your user directory!
 setwd("C:/Users/codyw/OneDrive/Documents/UC Berkeley/Analysis/Ignitions/Clone/electric-sector-wildfire/")
 
 # Packages
@@ -25,7 +23,7 @@ library(caret)
 library(pROC)
 library(doParallel)
 
-# Desired projection CRS
+# Desired coordinate reference system
 crs_number <- 4326
 
 ##################################################################
@@ -33,6 +31,8 @@ crs_number <- 4326
 ##################################################################
 
 SWITCH_NEW_LOAD <- F
+
+##################################################################
 
 # Relevant file paths
 path_spatial <- './data/Spatial Repository/'
@@ -99,7 +99,51 @@ if (SWITCH_NEW_LOAD) {
 # Generate dataset --------------------------------------------------------
 
 # Get conductor covariates like conductor age
-#source('./code/2 load_conductor_covariates.R')
+#source('./code/2a load_conductor_covariates.R')
 
 # Load hardening data
-#source('./code/2 load_hardening_data.R')
+#source('./code/2b load_hardening_data.R')
+
+# Load weather/climate data
+#source('./code/2c load_weather_covariates.R')
+
+# Load tree canopy data
+#source('./code/2d load_vegetation.R')
+
+# Load and process ignition data
+#source('./code/2e load_weather_covariates.R')
+
+# Load PSPS and fast-trip data
+#source('./code/2f load_PSPS.R')
+
+# Stitch together the various data inputs & covariates
+#source('./code/2g compile_dataset.R')
+
+# Modeling ----------------------------------------------------------------
+
+# Train and fit the ignition risk model
+#source('./code/3a risk_score.R')
+
+# Predict days when fast-trip settings enabled
+#source('./code/3b high_risk_days.R')
+
+# Match circuits and run regressions
+#source('./code/3c matching.R')
+
+# Structure risk ----------------------------------------------------------
+
+
+
+# Analyze results and generate figures ------------------------------------
+
+# Estimate cost-effectiveness and sensitivity analysis
+#source('./code/5a cost_effectiveness.R')
+
+# Run the monte carlo analysis and generate the risk reduction figures
+#source('./code/5b underground_curve.R')
+
+# Plot some of the key figures in the analysis
+#source('./code/5c main_figures.R')
+
+# Plot some additional figures and tables
+#source('./code/5d other_plots.R')
