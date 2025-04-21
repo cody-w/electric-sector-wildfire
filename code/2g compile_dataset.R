@@ -78,9 +78,9 @@ rm(epss_results); gc()
 # Drop 2014 given incomplete ignition data
 ################################################################################
 
-df_treatment <- df_treatment %>%
-  filter(year>2014)
-gc()
+# df_treatment <- df_treatment %>%
+#   filter(year>2014)
+# gc()
 
 ################################################################################
 # Bring in weather covariates #
@@ -104,7 +104,7 @@ loadWeatherVars <- function(df, w_var, dt_start, dt_end) {
   # Arrange and merge
   out_results <- out_results %>% 
     arrange(circuit.name, year, day) %>% 
-    filter(year>2014)
+    filter(year>=2014)
   out_results$date <- dt_range
   out_results$day  <- NULL
   
@@ -121,7 +121,7 @@ for(i in 1:length(weather_vars)) {
   
   # Execute
   df_treatment <- loadWeatherVars(df_treatment, weather_vars[i],
-                                  dt_start=ymd('2015-01-01'),
+                                  dt_start=ymd('2014-01-01'),
                                   dt_end=ymd('2023-12-31')) 
   gc()
 }
