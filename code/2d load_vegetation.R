@@ -1,10 +1,6 @@
 ################################################################################
-##
-## Project: Ignitions
-## Date:    Feb 23 2022
 ## File:    Load vegetation height data
 ## Purpose: Bring in LANDFIRE vegetation height data
-##
 ################################################################################
 
 
