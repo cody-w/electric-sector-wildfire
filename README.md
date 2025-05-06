@@ -54,7 +54,15 @@ This approach to parallel processing is used several times throughout the analys
 
 The next section of this script will loop through each weather variable (e.g., vapor pressure deficit, wind speed) and each year of weather data to calculate an average daily value across each grid cell that a given distribution intersects with.
 
+### Load vegetation
 
+This script [2d load_vegetation](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2d%20load_vegetation.R) imports data from USGS LANDFIRE on tree canopy height. The tree canopy data is provided in a raster format. This script calculates average and max canopy height for each distribution circuit. 
+
+### Load ignitions
+
+### Load PSPS and fast-trip 
+
+### Compile dataset
 
 ## Estimate risk models
 
