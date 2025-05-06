@@ -44,7 +44,17 @@ This script [2a load_conductor_covariates](https://github.com/cody-w/electric-se
 This script [2b load_hardening_data](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2b%20load_hardening_data.R) imports circuit-year data on vegetation management and system hardening. To convert the circuit-year data to the circuit-day level, weekly project progress reports provided by the utility are used. For one year, vegetation management is provided in different units. The utility reports trees worked instead of miles of vegetation management completed for this year. A crosswalk is created using data from prior years when both miles of vegetation management and trees worked are provided at the circuit level.
 
 ### Weather data
-This script [2c load_weather_covariates](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2c%20load_weather_covariates.R) imports gridded weather data from GridMET. 
+This script [2c load_weather_covariates](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2c%20load_weather_covariates.R) imports gridded weather data from GridMET. Initially, the script creates a crosswalk that intersects the locations of distribution circuits with the grid cells that the raster weather data is provided in. This step only needs to be run once, or alternatively it can be pre-loaded when `SWITCH_NEW_LOAD` is set to `FALSE`. If running from scratch (`SWITCH_NEW_LOAD` set to `TRUE`), the process will rely on parallel processing to improve processing time. This step will automatically detect the total number of cores available on the user's machine and utilize all the user's available cores: 
+```R
+  # Cores for parallel processing
+  no_cores <- detectCores()
+  registerDoParallel(no_cores)
+```
+This approach to parallel processing is used several times throughout the analysis. The user should be aware that these steps will utilize all available CPU on the user's machine. To avoid this, the user can set `no_cores` to a value less than the user's machine's total cores, but this will come at the cost of slower computation time. 
+
+The next section of this script will loop through each weather variable (e.g., vapor pressure deficit, wind speed) and each year of weather data to calculate an average daily value across each grid cell that a given distribution intersects with.
+
+
 
 ## Estimate risk models
 
