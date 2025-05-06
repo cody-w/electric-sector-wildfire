@@ -6,8 +6,8 @@
 # Setup
 rm(list=ls(all=T)); gc()
 
-# Set your user directory!
-setwd("C:/Users/codyw/OneDrive/Documents/UC Berkeley/Analysis/Ignitions/Clone/electric-sector-wildfire/")
+# Set your user directory to this repository!
+setwd()
 
 # Packages
 library(MASS) # be careful here select/dplyr masked
@@ -132,7 +132,11 @@ if (SWITCH_NEW_LOAD) {
 
 # Structure risk ----------------------------------------------------------
 
+# Intersect structure locations with wildfire perimeters
+#source('./code/4a intersect_structures')
 
+# Estimate structures burned at each circuit
+#source('./code/4b estimate_structures.R')
 
 # Analyze results and generate figures ------------------------------------
 
