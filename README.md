@@ -23,5 +23,9 @@ The first script to run is [1 master](https://github.com/cody-w/electric-sector-
 
 ### Miscellaneous functions
 
-The next script is [1 misc_functions](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/1%20misc_functions.R). 
+The next script is [1 misc_functions](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/1%20misc_functions.R). This script defines miscellaneous functions for regression formatting and confidence intervals. It also provides a crosswalk for CALFIRE regions to counties. 
+
+### Initiate spatial data
+
+The next script [1 iniate_spatial_boundaries]
 
