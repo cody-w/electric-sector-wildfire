@@ -35,3 +35,20 @@ The next script [1 iniate_spatial_boundaries](https://github.com/cody-w/electric
 
 This next section of code imports datasets on ignitions, vegetation, weather, distribution circuit characteristics, and circuit-level mitigation measures. The final script in this section compiles these different data sources inton one dataset for regression and cost-effectiveness analysis. 
 
+### Conductor covariates
+
+This script [2a load_conductor_covariates](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2a%20load_conductor_covariates.R) imports data about the age, the length, and the wind speed rating of distribution circuits. 
+
+### Hardening data
+
+This script [2b load_hardening_data](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2b%20load_hardening_data.R) imports circuit-year data on vegetation management and system hardening. To convert the circuit-year data to the circuit-day level, weekly project progress reports provided by the utility are used. For one year, vegetation management is provided in different units. The utility reports trees worked instead of miles of vegetation management completed for this year. A crosswalk is created using data from prior years when both miles of vegetation management and trees worked are provided at the circuit level.
+
+### Weather data
+This script [2c load_weather_covariates](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2c%20load_weather_covariates.R) imports gridded weather data from GridMET. 
+
+## Estimate risk models
+
+## Estimate structures burned
+
+## Analyze cost-effectiveness
+
