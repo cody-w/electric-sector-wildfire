@@ -68,9 +68,33 @@ Another step of this script is to identify which ignitions occurred when fast-tr
 
 ### Load PSPS and fast-trip 
 
+The next script [2f load_PSPS.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2f%20load_PSPS.R) imports the workbook that contains data on PSPS events. The names of circuits that experienced PSPS events appear to manually entered into the source data, so some data cleaning is needed to match the names of circuits that were de-energized with the GIS data on distribution circuits. 
+
+Data on fast-trip events is also loaded in from monthly reports on fast-trip events provided to the CPUC. Some fast-trip data is also sourced from WMP filings.
+
+Because the format of the PSPS and fast-trip data includes a start time and a restoration time, the script pro-rates the outage duration to different circuit-days if the outage extends past midnight to a second (or more) day.
+
+PSPS events can occur at a more granular spatial and temporal resolution than our unit of analysis, which is a circuit-day. In some cases, we observe ignitions on circuit-days when PSPS events occur. This script attempts to identify ignitions that occur outside of PSPS windows by using the timestamp of the ignition event and the PSPS event. 
+
 ### Compile dataset
 
+The last script [2g compile_dataset.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2g%20compile_dataset.R) in this section compiles all the various datasets described above into a single dataset for analysis. 
+
+As is the case with the PSPS event data, some cleaning of circuit names is required when merging the ignition data with the GIS data. This is needed because it appears some circuit names are manually entered into the source data, creating some typos and some inconsistencies in circuit name conventions. 
+
+The script also transforms the hardening and vegetation management data to a cumulative basis anchored to 2018. Therefore if a circuit received 10 miles of undergrounding in 2019 and 5 miles in 2020, then its ending value in 2020 will reflect 15 miles.
+
+The units of some treatment variables are transformed in this script. For example, the length of the circuit is measured in hundreds of miles rather than miles.
+
+Two versions of the main analysis dataset are exported in this step. One of them, "regression_dataset_full.RData", includes additional columns that are not critical to the remaining analysis. The other one, "regression_dataset_clean_full.RData", drops some of the unneeded columns for faster loading and computation. 
+
 ## Estimate risk models
+
+This section of the analysis primarily addresses the statistical models used to predict baseline ignition probability and to estimate the mitigation effectiveness coefficients.
+
+### Ignition risk model
+
+The first script here, [3a risk_score.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/3a%20risk_score.R),
 
 ## Estimate structures burned
 
