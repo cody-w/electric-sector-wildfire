@@ -1,7 +1,7 @@
 # electric-sector-wildfire
 Code, source data, and workpapers associated with "Dynamic Grid Management Technologies Reduce Electric-Power Sector Wildfire Adaptation Costs"
 
-Detailed documentation of analysis code is under construction.
+Detailed documentation of analysis code is being updated below.
 
 ## Overview
 
@@ -59,6 +59,12 @@ The next section of this script will loop through each weather variable (e.g., v
 This script [2d load_vegetation](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2d%20load_vegetation.R) imports data from USGS LANDFIRE on tree canopy height. The tree canopy data is provided in a raster format. This script calculates average and max canopy height for each distribution circuit. 
 
 ### Load ignitions
+
+This script [2e load_ignitions](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/2e%20load_ignitions.R) imports data sources from the California Public Utilities Commission and data produced from wildfire mitigaiton plans on powerline-caused ignitions. Over time, the annual files containing ignition data have changed formats, so data cleaning is required when compiling the different sources together. 
+
+Some years contain the name of the distribution circuit associated with the ignition in addition to the latitude and longitude of the ignition. In other cases, only the lat/long information is provided as a means of identifying the location. For the cases where only lat/long information is provided, this script finds the nearest distribution circuit to the point location. If no distribution circuit is in close proximity, the ignition is discarded. 
+
+Another step of this script is to identify which ignitions occurred when fast-trip settings were enabled. Lists of these ignitions are provided for 2021, 2022, and 2023 based on documents filed in the wildfire mitigation plan proceedings. 
 
 ### Load PSPS and fast-trip 
 
