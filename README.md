@@ -94,7 +94,19 @@ This section of the analysis primarily addresses the statistical models used to 
 
 ### Ignition risk model
 
-The first script here, [3a risk_score.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/3a%20risk_score.R),
+The first script here, [3a risk_score.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/3a%20risk_score.R), trains and tests the random forest model that predicts ignitions at the circuit-day level.
+
+The first part of the function cleans up the main analysis dataset and prepares it for training and testing. The user has the option to focus on equipment-caused on ignitions if interested, but the primary workflow of this analysis focuses only on vegetation-caused ignitions (see discussion in paper). 
+
+Various hyperparameters are tuned, and the user can specify alternate inputs if desired. Down-sampling is performed to create better balance between positive and negative ignition events. The default approach uses 3-repeat 10-fold cross-validation, and the random forest model uses 3, 6, or 9 features at each split. It ultimately selects the hyperparameter that results in the best model performance based on AUC value.
+
+The user has the option to re-run the random forest model, or load the existing model object given computation time can be long here.
+
+Performance statistics are generated after testing the model on the testing data. The model is then evaluated across all circuit-days. Various plots are generated, including the confusion matrix and feature importance.
+
+### Fast-trip enablement
+
+### Matching and logistic regression
 
 ## Estimate structures burned
 
