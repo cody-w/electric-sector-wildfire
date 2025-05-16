@@ -106,7 +106,25 @@ Performance statistics are generated after testing the model on the testing data
 
 ### Fast-trip enablement
 
+The next script [3b high_risk_days.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/3b%20high_risk_days.R) determines which circuit-days fast-trip settings are enabled on. It uses a publicly-available data on the utility's fire potential index (FPI) during ignition events. The script trains a model using a subset of those ignition events, along with detailed fire weather covariates, to predict whether or not the utility's FPI was at level three (R3) or greater. R3 or greater is the criteria to enable fast-trip settings, though in some cases the utility may enable fast-trip settings at a lower level if certain conditions are met. 
+
+The model is then evaluated on all circuit-days, even prior to 2021 when fast-trip settings were not deployed yet. The regression model described next will use these historical days when the fire potential index was R3 or greater to measure the effectiveness of fast-trip settings. 
+
 ### Matching and logistic regression
+
+The next script [3c high_risk_days.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/3c%20matching.R) implements the matching procedure and fits the logistic regression model to estimate mitigation effectiveness.
+
+The first step identifies circuits that received high or moderate levels of enhanced vegetation management (the language in the code calls these "doses" in the style of Callaway and Sant'anna 2022 differences-in-differences model). The next step prepares the regression dataset in the same fashion before it is used in the ignition probability prediction model. Other data preparation steps include merging in the FPI data and predicted baseline ignition probability from the random forest model. Then, indicators are constructed to reflect when fast-trip settings are enabled. Recall from the paper that some circuits were initially piloted with fast-trip settings in July 2021, and the remaining HFTD circuits had fast-trip settings enabled in 2022.
+
+Various treatment variables are constructed too. This includes indicator variables for whether the circuit is in the high vegetation management tranche or the moderate vegetation management tranche. 
+
+Next, a logistic regression model is specified prior to any matching technique. This regression result is shown in the first column of the primary regression table in the main text of the paper, and it used to illustrate potential bias from differences in baseline risk prior to matching. 
+
+The following step implements the matching technique in which circuits are matched to their nearest neighbors on the basis of average predicted ignition probability. The user has the option here to pick the number of matches (the default is `n = 1`). Robustness results are shown in the supplementary regression tables where `n = 2`. In other words, each treated circuit is matched to its two nearest neighbors in terms of average predicted ignition probability. The user also has the option to change the caliper size of the match (the default is `std = 0.1`). This parameter reflects that matches are only successful if the nearest neighbor's average ignition probability is within 10% of the sample's standard deviation ignition probability. The matching process uses replacment, so a control circuit can be matched multiple times to a different treated circuit.
+
+Once the control circuits have been matched to the treated circuits, the logistic regression model is run through several iterations. This includes a version where only circuits in the high vegetation management (and their matched control counterparts) are considered and a version where only the moderate vegetation management group is considered. The results for the high vegetation management group are shown in the second column of the regression table in the main text. The next set of regression models subset the sample to high-risk days (FPI of R3 or greater). These results are shown in the third column of the regression table in the main text.
+
+All of the regression models are stored and saved in the `rscore_models.RData` object and the regression dataset and matched groups are saved in the `reg_matched_data.RData` object.  
 
 ## Estimate structures burned
 
