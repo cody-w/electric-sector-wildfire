@@ -146,7 +146,13 @@ Because this analysis step is computationally-intensive, the `intersectHousing` 
 
 ### Estimate structures
 
-
+The second script in this section [4b estimate_structures.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/4b%20estimate_structures.R) uses empirical data on wildfire events in the utility's service territory to predict the probability that a given ignition will spread into a wildfire of a given size (e.g., less than 10 acres, greater than 10,000 acres). To do so, a random forest model is trained where the target variable is the wildfire size class. See the methods section in the paper for more detail.
 
 ## Analyze cost-effectiveness
+
+The last section of the analysis code addresses cost-effectiveness of mitigation measures and generates many of the plots shown in the paper. 
+
+### Cost-effectiveness
+
+This first script of the section [5a cost_effectiveness.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/5a%20cost_effectiveness.R)
 
