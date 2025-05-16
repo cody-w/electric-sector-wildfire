@@ -126,7 +126,27 @@ Once the control circuits have been matched to the treated circuits, the logisti
 
 All of the regression models are stored and saved in the `rscore_models.RData` object and the regression dataset and matched groups are saved in the `reg_matched_data.RData` object.  
 
+The remaining steps in the script transform the coefficients to incidence rates and transform the standard errors to confidence intervals using heteroskedastic robust standard errors. Performance statistics are also computed to assess the goodness-of-fit of the logistic regression models (area under the receiver operating characteristic curve is used to assess performance). 
+
+The script prints the results in a format that is friendly for Overleaf/Latex. If the user desires a simple text table the user can change the argument `type='latex'` to `type='text'` in the `stargazer` command. 
+
+Further below in the script the regression results are re-estimated for robustness, including adding regional fixed effects and matching on two control circuits (`n = 2`) in the matching technique.
+
 ## Estimate structures burned
+
+This section provides documentation for estimating the count of structures burned for each HFTD distribution circuit. 
+
+### Intersect structures
+
+The first of two scripts [4a intersect_structures.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/4a%20intersect_structures.R) focuses on estimating the potential number of structures impacted surrounding HFTD distribution circuits. The script begins by loading GIS circuit data and subsetting the data to circuits with at least 10 miles in the HFTD. Using the function `simulateIgnitions`, the script randomly drops 5 ignition points along each distribution circuit to assess potential structure impacts. These ignition locations are saved as `ignitions_pyrologix.RData`. 
+
+The next step uses the function `intersectHousing` to draw buffers around each simulated ignition point and intersect the buffers with structure locations and building loss factors. Building loss factors are sourced from the Conditional Risk to Potential Structures dataset, which uses simulated flame lengths at each pixel to assess the likelihood of a structure being lost if a fire were to occur in that pixel. The building loss factors do not take into account structure-specific defensive measures or construction materials. More on the methodology can be found in the paper.
+
+Because this analysis step is computationally-intensive, the `intersectHousing` function was run in four chunks across distribution circuits. Each output is saved in the sub-folder labeled [Missoula Fire Lab](https://github.com/cody-w/electric-sector-wildfire/tree/main/intermediate/Missoula%20Fire%20Lab).
+
+### Estimate structures
+
+
 
 ## Analyze cost-effectiveness
 
