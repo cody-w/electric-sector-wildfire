@@ -263,8 +263,6 @@ reg_data <- reg_data %>%
 # Regression specification
 ################################################################################
 
-load(file='../../intermediate_24/reg_data_for_bootstrap_Aug2024.RData')
-
 risk_binary <- formula(paste0('is_ignition ~ is_high_evm + is_mid_evm + ',
                               'is_any_high + is_any_mid + ',
                             'underground_units + covered_units + is_psps + is_epss_enable',
@@ -291,9 +289,6 @@ summary(mm_risk)
 
 # Write function to match directly on risk score
 matchRiskScore <- function(dat, std=0.1, n=1) {
-  #dat <- reg_data
-  #std <- 0.1
-  #n   <- 1
   
   # Get average risk scores
   risk <- dat %>%

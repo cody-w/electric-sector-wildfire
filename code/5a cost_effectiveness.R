@@ -772,7 +772,7 @@ df_units <- getAnnualInvestment(df_main)
 
 # Cost Function
 calculateCosts <- function(in_ign, in_units,
-                           r_disc, r_wacc, hh_pct,
+                           r_disc, r_wacc,
                            c_veg, c_ug, c_epss_hr, c_psps_hr,
                            c_routine_veg = 400E6/25E3,
                            maint_veg, maint_ug, share_overhead_ug=0.75,
