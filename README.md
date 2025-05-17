@@ -182,5 +182,17 @@ The `calculateCosts` function calculates total costs of each mitigation measure 
 - `maint_veg` and `maint_ug` are the operations and maintenance costs expressed as a share of per-mile costs
 - `share_overhead_ug` is the ratio of overhead line length that underground lines replace (a mile of overhead line is shorter than a replacement mile of underground line because overhad lines can more easily avoid surface and below-surface obstacles)
 - `year_pv` is the base year to calculate present value for net present value calculations
+- `lost_load` contains the value of lost load assumptions by customer class
 - `outages` is a dataframe containing the customer-hours of fast-trip and PSPS outages for reliability cost calculations
+
+The first part of the function calculates reliability costs using `lost_load` and `outages`. The next part calculates undergrounding costs, which includes both the total capital investment and the rate of return earned on the remaining useful component of the undergrounding asset each year. The components of these costs that accrue in future years are discounted. 
+
+Maintenance costs for both vegetation management and undergrounding are calculated over their lifetimes and discounted as well. Additionally, avoided routine vegetation management costs are calculated for underground circuit-miles. 
+
+The following part of the procedure discounts the avoided ignitions and avoided structure losses that occur in future years. Lastly, discounted costs, discounted avoided ignitions, discounted structure losses, and reliability costs are summed across their lifetimes to get 2023 NPV basis. The cost-effectiveness for each measure is then calculated with the numerator being the mitigation cost, including reliability impacts and avoided routine vegetation management costs, and the denominator being either avoided ignitions or avoided structure losses. This is done for each mitigation measure, as well as a combined approach where PSPS and fast-trip are considered together. The results of this procedure are shown in the main bar chart cost-effectiveness plot in the paper. 
+
+The final piece of this script re-runs the `calculateCosts` function with different sensitivities. These sensitivities make up the upper and lower ends of the whiskers shown in the cost-effectiveness bar plot. This last step takes a significant amount of time to run because the dataset is quite large spanning up to 50 years in the future, and many iterations are required to test sensitivities related to discount rate, future climate change impacts, per-mile costs, and so forth. 
+
+### Underground curve
+
 
