@@ -195,4 +195,22 @@ The final piece of this script re-runs the `calculateCosts` function with differ
 
 ### Underground curve
 
+The next component of the cost-effectiveness section, [5b underground_curve.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/5b%20underground_curve.R), takes a similar approach to the previous cost-effectiveness script. However, in this case, rather than creating point estimates for the cost-effectiveness bar chart using the actual amount of undergrounding deployed by the utility, this analysis constructs counterfactuals where zero to all overhead HFTD circuit-miles are converted to underground, and cost-effectiveness estimates are produced along a curve for each of these points. This script produces the results necessary to generate the curves in the final plot of the main text of the paper.
 
+The `mergeStructuresReshape` function merges in potential structure losses for each circuit-day with the main time-series datasets that contain sampled weather days at various levels of climate change modifiers.
+
+The `estimateUndergroundingBenefit` function calculates the avoided structures burned for each distribution circuit individiually assuming it was placed underground. As a part of this calculation, avoided outage impacts in terms of customer-hours are assessed for each distribution circuit. Next, circuits are ranked in terms of cost-effectiveness of undergrounding. 
+
+The `estimateUndergroundingCost` function then calculates the costs of undergrounding each of these distribution circuits. As a part of this analysis, we assume fast-trip outages and PSPS outages increase in step with climate change trajectories. See methods of the paper for more detail. Thus, undergrounding will avoid increased fast-trip and PSPS outages in future years. 
+
+The final function `costEffectiveness` combines the avoided structures for each distribution circuit with the estimated costs (and avoided costs) of undergroundin that distribution circuit. Circuits are then ranked in terms of most cost-effective to least cost-effective to generate the curves. 
+
+Next, the `monteCarlo` function re-runs this analysis 200 times, with each draw including a different discount rate, value of lost load, effectiveness of fast-trip settings, undergrounding cost per-mile, PSPS and fast-trip hourly cost to the utility, and climate change modifier. The results of the Monte Carlo analysis generate the shaded confidence intervals seen in the curves in the main text of the paper. 
+
+### Main figures
+
+This script draws on many of the analysis outputs to create the main plots relied upon in the paper. 
+
+### Other plots
+
+This script generates the supplementary plots relied upon in the suppelementary material and appendices. 
