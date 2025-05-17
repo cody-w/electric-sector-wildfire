@@ -154,5 +154,33 @@ The last section of the analysis code addresses cost-effectiveness of mitigation
 
 ### Cost-effectiveness
 
-This first script of the section [5a cost_effectiveness.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/5a%20cost_effectiveness.R)
+This first script of this section [5a cost_effectiveness.R](https://github.com/cody-w/electric-sector-wildfire/blob/main/code/5a%20cost_effectiveness.R) contains the primary analysis that generates the cost-effectiveness bar chart in the main text of the paper. The first part of the script specifies key parameter values, including cost of capital, discount rate, asset life of the underground line, and so forth. Value of lost load (VOLL) parameters are specified in the beginning part of this script as well.
+
+The next part merges in the estimated structure losses for each circuit-day. Outage information for PSPS and fast-trip is tabulated to determine the share of customer classes (e.g., residential, industrial) that are typically impacted by an outage event. 
+
+Cost parameters are specified for the mitigation measures are specified next. For more information about the sources for these cost parameters, please see the methods section of the paper.
+
+The `getUnits` function creates a time-series dataset of the mitigation measures that extends into the future as far out as the asset's lifetime. In other words, to effectively model the costs and risk reduction of undergrounding, which can have an asset life of four or five decades, the analysis must create a circuit-day dataset for each circuit up to 50 years beyond 2023. Needless to say, this creates a very large dataset in which hundreds of distribution circuits have daily observations for 50 years. For cost accounting, this step also depreciates the undergrounding asset over its useful life. Straight-line (linear) depreciation is assumed. This is important because the electric utility earns a regulated rate of return that is charged to ratepayers on the non-depreciated component of the undergrounding asset. 
+
+The `getWeatherTimeSeries` function then randomly draws weather observations from the historical dataset to populate the expanded time-series dataset created by the `getUnits` procedure. Here, the user can specify the rate at which fire weather increases in future years due to climate change using the `risk_by_2050` argument. The default value is `risk_by_2050 = 0.5` which indicates in the year 2050 only the 50th percentile of fire risk weather is used when randomly sampling, and the percentile linearly increases from 0 to 50 between 2024 and 2050. The argument `ignition_switch` and the argument `combined_risk_switch` are used to determine how the percentiles should be assessed. If `ignition_switch` is used, then percentiles are based upon ignition probability. If neither `ignition_switch` or `combined_switch` is used, then percentiles are based off of the probability of a wildfire exceeding 10 acres. If `combined_switch` is used, then percentiles are based upon the product of ignition probability and probability of a wildfire exceeding 10 acres. More detail can be found in the methods section of the paper. This function is run over several iterations where the different asset lifetimes are used (30, 40, and 50 year underground asset lifetimes) and different climate change modifiers are used (25th, 50th, and 75th percentiles). Given the computation time of this procedure, the intermediate products are saved in the [Intermediate Climatology](https://github.com/cody-w/electric-sector-wildfire/tree/main/intermediate/Intermediate%20Climatology) sub-folder.
+
+The `constructDataset` function is an intermediate step that combines the time-series dataset from `getUnits` with the sampled weather data from `getWeatherTimeSeries` step. 
+
+The `estimateIgnitions` procedure then uses the regression coefficients modeled earlier to predict the count of ignitions under different mitigation deployments. The procedure first estimates ignitions assuming no mitigations are deployed as a baseline. It then estimates ignitions separately when vegetation management is deployed, fast-trip settings are enabled, PSPS is activated, and undergrounding is deployed. Structure losses associated with each ignition are calculated for each circuit-day by multiplying the estimated probability of the wildfire class size by the average size in acres of the wildfire class size and by the structures losses per acre obtained in the previous section of the analysis. See methods in the paper for more detail on the calculation. Avoided ignitions are calculated as the difference between baseline estimated ignitions and estimated ignitions with the respective mitigation measure deployed. Avoided structure losses are calculated as avoided ignitions multiplied by expected structure losses for that circuit-day. Avoided ignitions and structure losses for vegetation management are depreciated over the lifetime of vegetation management asset given vegetation grows back over time. Finally, avoided ignitions and structure losses are summarized at the annual level for cost-effectiveness assessment.
+
+The `getAnnualInvestment` function summarizes the cirucit-day time-series data on vegetation management and undergrounding into an annual basis to align with the estimated ignitions and structure losses.
+
+The `calculateCosts` function calculates total costs of each mitigation measure under various cost parameterizations. A description of key parameters/arguments into this function follows:
+
+- `r_disc` is the real social discount rate
+- `r_wacc` is the authorized rate of return the utility earns on capital investment
+- `c_veg` is the cost per mile of vegetation management
+- `c_ug` is the cost per mile of undergrounding
+- `c_epss_hr` is the cost to the utility of fast-trip outages per customer-hour of outage (think of these as patrol and re-energization costs the utility incurs)
+- `c_psps_hr` is the equivalent of `c_epss_hr` for PSPS
+- `c_routine_veg` is the per-mile cost of routine vegetation management work (this is used as an avoided cost for undergrounding)
+- `maint_veg` and `maint_ug` are the operations and maintenance costs expressed as a share of per-mile costs
+- `share_overhead_ug` is the ratio of overhead line length that underground lines replace (a mile of overhead line is shorter than a replacement mile of underground line because overhad lines can more easily avoid surface and below-surface obstacles)
+- `year_pv` is the base year to calculate present value for net present value calculations
+- `outages` is a dataframe containing the customer-hours of fast-trip and PSPS outages for reliability cost calculations
 
